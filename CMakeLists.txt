@@ -6,8 +6,14 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -O2")
 
 include_directories(include)
 
-add_executable(auto_middleware
-    src/main.cpp
-    src/middleware/MessageBus.cpp
-    src/transport/TcpSocket.cpp
+file(GLOB_RECURSE SOURCES
+    "src/*.cpp"
 )
+
+add_executable(message_bus ${SOURCES})
+
+#add_executable(auto_middleware
+#    src/main.cpp
+#    src/middleware/MessageBus.cpp
+#    src/transport/TcpSocket.cpp
+#)
