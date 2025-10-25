@@ -3,9 +3,17 @@
 #include <vector>
 #include <memory>
 #include <mutex>
-#include "Subscriber.hpp"
-#include "Message.hpp"
+#include "interface/PublisherSubscriber.hpp"
+#include "interface/Message.hpp"
 
+/*
+ * MessageBus Class
+ *
+ * A simple publish-subscribe message bus
+ * Pattern: Observer + Singleton
+ * Should be instantiated as Singleton
+ * 
+ */
 class MessageBus {
 public:
     static MessageBus& instance() {

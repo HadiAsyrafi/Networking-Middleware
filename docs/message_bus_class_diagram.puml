@@ -1,0 +1,31 @@
+@startuml
+class Message {
+  - type_ : string
+  + type() : string
+}
+
+class RpmMessage {
+  - value_ : int
+  + value() : int
+}
+
+abstract class Subscriber {
+  + onMessage(msg: MessagePtr)
+}
+
+class EngineSubscriber {
+  + onMessage(msg: MessagePtr)
+}
+
+class MessageBus <<singleton>> {
+  - subscribers_ : map<string, vector<Subscriber>>
+  + instance() : MessageBus&
+  + subscribe(topic: string, sub: Subscriber)
+  + publish(msg: MessagePtr)
+}
+
+Message <|-- RpmMessage
+Subscriber <|-- EngineSubscriber
+MessageBus o-- "*" Subscriber
+EngineSubscriber ..> RpmMessage : uses
+@enduml

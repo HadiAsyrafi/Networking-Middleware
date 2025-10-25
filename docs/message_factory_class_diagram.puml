@@ -1,0 +1,21 @@
+@startuml
+class Message {
+  - type_ : std::string
+  + type() : std::string
+}
+
+class RpmMessage {
+  - value_ : int
+  + value() : int
+}
+
+class MessageFactory <<singleton>> {
+  + instance()
+  + registerType(name)
+  + create(name)
+}
+
+Message <|-- RpmMessage
+MessageFactory --> Message : create()
+MessageFactory ..> RpmMessage : registerType()
+@enduml

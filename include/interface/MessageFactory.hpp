@@ -4,6 +4,14 @@
 #include <string>
 #include "Message.hpp"
 
+/*
+ * MessageFactory Class
+ *
+ * A simple factory for creating Message instances
+ * Pattern: Factory
+ * Should be instantiated as Singleton
+ * 
+ */
 class MessageFactory {
 public:
     using Creator = std::function<MessagePtr()>;
