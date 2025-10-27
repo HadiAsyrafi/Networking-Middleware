@@ -1,9 +1,40 @@
-@startuml
+@startuml class_diagram
+
+/'  Base unit to represent any data passed through the bus
+ '/
 class Message {
-  - type_ : std::string
-  + type() : std::string
+  - m_topic     : std::string
+  - m_value     : int
+  + getTopic()  : std::string
+  + getValue()  : int
 }
 
+/'  Routes messages between publishers and subscribers
+    Pattern: Observer + Singleton
+ '/
+class MessageBus {
+  - m_subscribers : std::map<topic, subscribers>
+  + subscribe()   : void
+  + publish()     : void
+}
+
+/'  Represents entity that wants to receive messages
+    Implement callback to process messages
+ '/
+class Subscriber {
+  - m_topics      : std::vector<std::string>
+  + onMessage()   : void
+}
+
+/'  Represents entity that generates messages
+    Constructs a Message, and passes it to MessageBus
+ '/
+class Publisher {
+  - m_topics      : std::vector<std::string>
+  + publish()     : void
+}
+
+/'
 class RpmMessage {
   - value_ : int
   + value() : int
@@ -14,8 +45,6 @@ class MessageFactory <<singleton>> {
   + registerType(name)
   + create(name)
 }
+'/
 
-Message <|-- RpmMessage
-MessageFactory --> Message : create()
-MessageFactory ..> RpmMessage : registerType()
 @enduml
