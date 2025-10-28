@@ -5,19 +5,23 @@
 #include <iostream>
 #include <thread>
 
-#include <interface/Message.hpp>
+#include <interface/MessageFactory.hpp>
 #include <middleware/MessageBus.hpp>
 #include <app/EngineSubscriber.hpp>
 
 int main() {
+    // Create Bus
     auto msgBus    = MessageBus();
-    auto engineSub = makeEngineSubscriber();
 
+    // Create Subscriber
+    auto engineSub = makeEngineSubscriber();
     msgBus.subscribe("RPM", engineSub);
 
+    // ECU Simulation
+    MessageFactory* msgFactory = new RpmMsgFactory();
+
     for (int i = 0; i < 5; ++i) {
-        int rpm = 1000 + rand() % 5000;
-        auto msg = std::make_shared<RpmMessage>(rpm);
+        auto msg = msgFactory->factoryMethod();
         msgBus.publish(msg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }

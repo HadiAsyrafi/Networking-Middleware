@@ -7,6 +7,7 @@ class Message {
 public:
     virtual ~Message() = default;
     virtual std::string getTopic() const = 0;
+    virtual std::string getValue() const = 0;
 };
 
 // Concrete implementation
@@ -15,14 +16,14 @@ class RpmMessage : public Message {
 public:
     explicit RpmMessage(int value) : m_value(value) {}
     std::string getTopic() const override { return "RPM"; }
-    int getValue() const { return m_value; }
+    std::string getValue() const override { return std::to_string(m_value); }
 };
 
 class StatusMessage : public Message {
     std::string m_status;
 public:
     std::string getTopic() const override { return "STATUS"; }
-    std::string getStatus() const { return m_status; }
+    std::string getValue() const override { return m_status; }
 };
 
 using MessagePtr = std::shared_ptr<Message>;

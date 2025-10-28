@@ -6,13 +6,11 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -O2")
 
 include_directories(include)
 
-#file(GLOB_RECURSE SOURCES
-#    "src/*.cpp"
-#)
+file(GLOB_RECURSE SOURCES
+    "src/*.cpp"
+)
 
-#add_executable(message_bus ${SOURCES})
-
-add_executable(messaging_app src/main.cpp)
+add_executable(auto_middleware ${SOURCES})
 
 #add_executable(auto_middleware
 #    src/main.cpp

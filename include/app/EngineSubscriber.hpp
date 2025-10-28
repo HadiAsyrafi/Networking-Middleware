@@ -12,7 +12,7 @@ public:
     void onMessage(const MessagePtr& msg) override
     {
         std::cout << "[" << msg->getTopic()
-            << "] Engine RPM: " << msg->value() << std::endl;
+            << "] Engine RPM: " << msg->getValue() << std::endl;
     }
 };
 
