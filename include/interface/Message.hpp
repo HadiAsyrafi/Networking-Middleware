@@ -19,11 +19,11 @@ public:
     std::string getValue() const override { return std::to_string(m_value); }
 };
 
-class StatusMessage : public Message {
+class TempMessage : public Message {
     std::string m_status;
 public:
-    explicit StatusMessage(const std::string& status) : m_status(status) {}
-    std::string getTopic() const override { return "STATUS"; }
+    explicit TempMessage(const std::string& status) : m_status(status) {}
+    std::string getTopic() const override { return "TEMP"; }
     std::string getValue() const override { return m_status; }
 };
 

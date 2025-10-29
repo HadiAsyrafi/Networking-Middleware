@@ -16,11 +16,11 @@ int main() {
     // Create Subscriber
     auto engineSub = makeEngineSubscriber();
     msgBus.subscribe("RPM", engineSub);
-    msgBus.subscribe("STATUS", engineSub);
+    msgBus.subscribe("TEMP", engineSub);
 
     // ECU Simulation
     auto rpmFactory = std::make_unique<RpmMsgFactory>();
-    auto statusFactory = std::make_unique<StatMsgFactory>();
+    auto tempFactory = std::make_unique<TempMsgFactory>();
 
     for (int i = 0; i < 5; ++i) {
         // Create RPM message
@@ -28,7 +28,7 @@ int main() {
         msgBus.publish(rpmMsg);
 
         // Create Status message
-        auto statusMsg = statusFactory->factoryMethod();
+        auto statusMsg = tempFactory->factoryMethod();
         msgBus.publish(statusMsg);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
