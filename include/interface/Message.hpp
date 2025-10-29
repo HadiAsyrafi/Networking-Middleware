@@ -22,6 +22,7 @@ public:
 class StatusMessage : public Message {
     std::string m_status;
 public:
+    explicit StatusMessage(const std::string& status) : m_status(status) {}
     std::string getTopic() const override { return "STATUS"; }
     std::string getValue() const override { return m_status; }
 };

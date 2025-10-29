@@ -16,13 +16,21 @@ int main() {
     // Create Subscriber
     auto engineSub = makeEngineSubscriber();
     msgBus.subscribe("RPM", engineSub);
+    msgBus.subscribe("STATUS", engineSub);
 
     // ECU Simulation
-    MessageFactory* msgFactory = new RpmMsgFactory();
+    auto rpmFactory = std::make_unique<RpmMsgFactory>();
+    auto statusFactory = std::make_unique<StatMsgFactory>();
 
     for (int i = 0; i < 5; ++i) {
-        auto msg = msgFactory->factoryMethod();
-        msgBus.publish(msg);
+        // Create RPM message
+        auto rpmMsg = rpmFactory->factoryMethod();
+        msgBus.publish(rpmMsg);
+
+        // Create Status message
+        auto statusMsg = statusFactory->factoryMethod();
+        msgBus.publish(statusMsg);
+
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 

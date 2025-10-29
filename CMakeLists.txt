@@ -11,9 +11,3 @@ file(GLOB_RECURSE SOURCES
 )
 
 add_executable(auto_middleware ${SOURCES})
-
-#add_executable(auto_middleware
-#    src/main.cpp
-#    src/middleware/MessageBus.cpp
-#    src/transport/TcpSocket.cpp
-#)

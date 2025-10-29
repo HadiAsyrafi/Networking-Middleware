@@ -54,6 +54,7 @@ public:
 class StatMsgFactory : public MessageFactory {
 public:
     MessagePtr factoryMethod() const override {
-        return std::make_shared<StatusMessage>();
+        std::string status = "Engine Running";
+        return std::make_shared<StatusMessage>(status);
     }
 };
