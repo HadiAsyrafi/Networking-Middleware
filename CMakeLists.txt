@@ -11,3 +11,9 @@ file(GLOB_RECURSE SOURCES
 )
 
 add_executable(auto_middleware ${SOURCES})
+
+# Find and link pthread
+# Note: pthreads is a separate library (pthread.so) that must be explicitly linked
+# Note: <thread> only provide declaration, but not implementation
+find_package(Threads REQUIRED)
+target_link_libraries(auto_middleware PRIVATE Threads::Threads)
