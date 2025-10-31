@@ -4,6 +4,9 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <mutex>
+#include <queue>
+#include <condition_variable>
 
 #include <interface/MessageFactory.hpp>
 #include "middleware/MessageBus.hpp"
@@ -91,29 +94,53 @@ private:
     std::unique_ptr<TempMsgFactory> m_factory;
 };
 
+// Concrete Subscriber
+class DashboardSubscriber : public Subscriber {
+public:
+    // Queue first - fast & non-blocking
+    void onMessage(const MessagePtr& msg) override {
+        std::lock_guard<std::mutex> lock(m_queueMutex);
+        m_messageQueue.push(msg);
+    }
+
+    bool hasMessage() const
+    {
+        return !m_messageQueue.empty();
+    }
+
+    void print()
+    {
+        std::lock_guard<std::mutex> lock(m_queueMutex);
+        if (!m_messageQueue.empty()) {
+            auto msg = m_messageQueue.front();
+            m_messageQueue.pop();
+            std::cout << "Dashboard [" << msg->getTopic()
+                << "]  \t:" << msg->getValue() << std::endl;
+        }
+    }
+
+private:
+    std::queue<MessagePtr> m_messageQueue;
+    std::mutex             m_queueMutex;
+    //std::condition_variable m_cv;     // Explore its use for blocking wait
+};
+
 // Concrete Implementation
 class DashboardECU : public ECU {
 public:
     DashboardECU(MessageBus& bus) : ECU(bus) {}
 
-    // Concrete Subscriber
-    class DashboardSubscriber : public Subscriber {
-    public:
-        void onMessage(const MessagePtr& msg) override
-        {
-            std::cout << "Dashboard [" << msg->getTopic()
-                << "]  \t:" << msg->getValue() << std::endl;
-        }
-    };
-
-    std::shared_ptr<DashboardSubscriber> getSubscriber() const {
-        return m_subscriber;
+    void subscribeTopic(const std::string& string) {
+        m_messageBus.subscribe(string, m_subscriber);
     }
 
 protected:
     void run() override {
         while (m_running) {
             // Infinite loop - do nothing for now
+            if (m_subscriber->hasMessage()) {
+                m_subscriber->print();
+            }
         }
     }
 

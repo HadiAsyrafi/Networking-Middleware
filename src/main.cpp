@@ -15,12 +15,15 @@ int main() {
 
     // Dashboard ECU
     DashboardECU dashboardEcu(msgBus);
-    msgBus.subscribe("RPM", dashboardEcu.getSubscriber());
-    msgBus.subscribe("TEMP", dashboardEcu.getSubscriber());
+    dashboardEcu.subscribeTopic("RPM");
+    dashboardEcu.subscribeTopic("TEMP");
 
     // ECU Simulation
     RpmECU rpmEcu(msgBus);
     TempECU tempEcu(msgBus);
+
+    // Start all ECUs
+    dashboardEcu.start();
     rpmEcu.start();
     tempEcu.start();
 
