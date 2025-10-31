@@ -48,7 +48,7 @@ protected:
 // Concrete Implementation
 class RpmECU : public ECU {
 public:
-    RpmECU(MessageBus& bus) : ECU(bus) {}
+    RpmECU(MessageBus& bus) : ECU(bus), m_factory(std::make_unique<RpmMsgFactory>()) {}
 
 protected:
     void run() override {
@@ -60,18 +60,18 @@ protected:
     }
 
     MessagePtr createMessage() override {
-        auto rpmFactory = std::make_unique<RpmMsgFactory>();
-        return rpmFactory->factoryMethod();
+        return m_factory->factoryMethod();
     }
 
 private:
-    std::chrono::milliseconds m_sleepTime{200 + (rand() % 501)};
+    std::chrono::milliseconds      m_sleepTime{200 + (rand() % 501)};
+    std::unique_ptr<RpmMsgFactory> m_factory;
 };
 
 // Concrete Implementation
 class TempECU : public ECU {
 public:
-    TempECU(MessageBus& bus) : ECU(bus) {}
+    TempECU(MessageBus& bus) : ECU(bus), m_factory(std::make_unique<TempMsgFactory>()) {}
 
 protected:
     void run() override {
@@ -83,10 +83,10 @@ protected:
     }
 
     MessagePtr createMessage() override {
-        auto tempFactory = std::make_unique<TempMsgFactory>();
-        return tempFactory->factoryMethod();
+        return m_factory->factoryMethod();
     }
 
 private:
-    std::chrono::milliseconds m_sleepTime{500 + (rand() % 301)};
+    std::chrono::milliseconds       m_sleepTime{500 + (rand() % 301)};
+    std::unique_ptr<TempMsgFactory> m_factory;
 };
