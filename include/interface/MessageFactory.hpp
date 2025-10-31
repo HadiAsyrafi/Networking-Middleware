@@ -46,15 +46,16 @@ public:
 class RpmMsgFactory : public MessageFactory {
 public:
     MessagePtr factoryMethod() const override {
-        int rpm = 1000 + rand() % 5000;
-        return std::make_shared<RpmMessage>(rpm);
+        int randRpm = 1000 + rand() % 5000;
+        return std::make_shared<RpmMessage>(randRpm);
     }
 };
 
 class TempMsgFactory : public MessageFactory {
 public:
     MessagePtr factoryMethod() const override {
-        std::string status = "Engine Running";
+        int randTemp = 50 + rand() % 80;
+        auto status = std::to_string(randTemp) + "C";
         return std::make_shared<TempMessage>(status);
     }
 };

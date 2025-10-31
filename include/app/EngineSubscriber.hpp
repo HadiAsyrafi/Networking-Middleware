@@ -11,8 +11,8 @@ class EngineSubscriber : public Subscriber {
 public:
     void onMessage(const MessagePtr& msg) override
     {
-        std::cout << "[" << msg->getTopic()
-            << "] Engine RPM: " << msg->getValue() << std::endl;
+        std::cout << "Engine ECU [" << msg->getTopic()
+            << "] : " << msg->getValue() << std::endl;
     }
 };
 

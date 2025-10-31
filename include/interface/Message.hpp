@@ -20,11 +20,11 @@ public:
 };
 
 class TempMessage : public Message {
-    std::string m_status;
+    std::string m_value;
 public:
-    explicit TempMessage(const std::string& status) : m_status(status) {}
+    explicit TempMessage(const std::string& status) : m_value(status) {}
     std::string getTopic() const override { return "TEMP"; }
-    std::string getValue() const override { return m_status; }
+    std::string getValue() const override { return m_value; }
 };
 
 using MessagePtr = std::shared_ptr<Message>;
