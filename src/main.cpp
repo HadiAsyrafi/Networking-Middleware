@@ -13,21 +13,21 @@ int main() {
     // Create Bus
     auto msgBus    = MessageBus();
 
-    // Simulate Subscriber
-    auto engineSub = makeEngineSubscriber();
-    msgBus.subscribe("RPM", engineSub);
-    msgBus.subscribe("TEMP", engineSub);
+    // Dashboard ECU
+    DashboardECU dashboardEcu(msgBus);
+    msgBus.subscribe("RPM", dashboardEcu.getSubscriber());
+    msgBus.subscribe("TEMP", dashboardEcu.getSubscriber());
 
     // ECU Simulation
     RpmECU rpmEcu(msgBus);
-    rpmEcu.start();
-
     TempECU tempEcu(msgBus);
+    rpmEcu.start();
     tempEcu.start();
 
     // Let it run for 3 seconds
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
+    dashboardEcu.stop();
     rpmEcu.stop();
     tempEcu.stop();
 

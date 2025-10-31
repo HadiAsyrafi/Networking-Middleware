@@ -90,3 +90,38 @@ private:
     std::chrono::milliseconds       m_sleepTime{500 + (rand() % 301)};
     std::unique_ptr<TempMsgFactory> m_factory;
 };
+
+// Concrete Implementation
+class DashboardECU : public ECU {
+public:
+    DashboardECU(MessageBus& bus) : ECU(bus) {}
+
+    // Concrete Subscriber
+    class DashboardSubscriber : public Subscriber {
+    public:
+        void onMessage(const MessagePtr& msg) override
+        {
+            std::cout << "Dashboard [" << msg->getTopic()
+                << "]  \t:" << msg->getValue() << std::endl;
+        }
+    };
+
+    std::shared_ptr<DashboardSubscriber> getSubscriber() const {
+        return m_subscriber;
+    }
+
+protected:
+    void run() override {
+        while (m_running) {
+            // Infinite loop - do nothing for now
+        }
+    }
+
+    MessagePtr createMessage() override {
+        // Not used by DashboardECU - just implementing interface
+        return nullptr;
+    }
+
+private:
+    std::shared_ptr<DashboardSubscriber> m_subscriber = std::make_shared<DashboardSubscriber>();
+};
