@@ -1,0 +1,95 @@
+Learning path (progression):
+
+- Fundamentals: CPU cores, caches, memory hierarchy, memory ordering, false sharing, context switches.
+- C++ concurrency: threads, mutexes, condition_variable, atomics, memory_order, thread-safe data structures.
+- Profiling & tracing: sampling profilers, flame graphs, eBPF tracing, lock contention analysis.
+- Advanced: lock-free algorithms, NUMA-awareness, scheduling, hardware performance counters.
+- Practice: instrument a real multi-threaded app, iterate measurement → hypothesis → change → validate.
+
+
+Books / reading:
+
+- C++ Concurrency in Action (Anthony Williams) — concurrency primitives, patterns.
+- Systems Performance / Flame Graphs (Brendan Gregg) — profiling, flamegraphs, eBPF.
+- Linux perf tutorial / man pages.
+
+
+Quick tooling list (Linux):
+
+- Compilers: g++/clang++ with -g/-O2; sanitizers: ThreadSanitizer (TSAN), AddressSanitizer (ASan), UBSan.
+- Profilers: perf (kernel perf), bpftrace / BCC (eBPF), perf + FlameGraph.
+- Contention analyzers: perf lock, Google’s gperftools CPU profiler, Intel VTune (commercial).
+- Race checkers: ThreadSanitizer (clang/gcc), Valgrind Helgrind (slow).
+- Memory: valgrind massif / massif-visualizer, ASan.
+- Utility: top/htop, pidstat, vmstat, iostat, numactl, taskset.
+- Microbenchmark: Google Benchmark.
+- Practical commands you can run in your project folder
+
+
+Details:
+
+1. Build with debug symbols and optimizations
+2. Run under ThreadSanitizer to find races (use -O1 recommended)
+    >> g++ -g -O1 -fsanitize=thread -std=c++17 -pthread src/*.cpp -o build/app_tsan
+    >> ./build/app_tsan
+3. Sample CPU with perf + produce a flamegraph
+    >> sudo perf record -F 99 -g -- ./build/app
+    >> sudo perf script > out.perf          (requires FlameGraph scripts)
+    >> /path/to/FlameGraph/stackcollapse-perf.pl out.perf | /path/to/FlameGraph/flamegraph.pl > perf.svg
+    >> open perf.svg in a browser
+4. Quick live view of hotspots
+    >> sudo perf top -g
+5. Check lock contention and mutex waiters
+    >> sudo perf record -e sched:sched_switch -a -g -- ./build/app
+    >> sudo perf report --stdio
+    or
+    >> sudo perf lock record ./build/app
+    >> sudo perf lock report
+6. eBPF stacks with bpftrace (sampling stack traces)
+    >> sudo bpftrace -e 'profile:hz:97 /comm == "app"/ { @[ustack] = count(); }' -o stacks.bt
+    or
+    >> sudo /usr/share/bcc/tools/offcputime -p $(pidof app)
+7. Check thread list and pinning
+    >> ps -L -p $(pidof app)                            # list threads
+    >> taskset -c 0-3 ./build/app                       # pin process to CPUs 0..3
+    >> numactl --cpunodebind=0 --membind=0 ./build/app  # NUMA bind
+8. Valgrind Helgrind (slow) for concurrency issues
+    >> valgrind --tool=helgrind ./build/app
+
+
+Further Resource:
+
+Measurement methodology & quick rules
+- Profile first: don’t guess — identify hotspots and contention points with sampling profilers.
+- Use representative workloads and repeat runs; capture variance.
+- Start with optimized builds (-O2) for profiling real behavior; sanitizers slow things—use them for debugging only.
+- Change one thing at a time and keep metrics.
+- Distinguish CPU-bound vs I/O / blocking waits (use off-CPU profiling like offcputime, perf trace).
+- Look for synchronization hot-spots, long hold times, high waiter counts.
+
+Common concurrency performance problems and fixes
+- Mutex contention: use finer-grain locks, per-shard locks, lock-free structures, reader-writer locks for read-heavy workloads.
+- False sharing: align frequently-updated fields to cache line (alignas(64)) or pad structs.
+- Excessive thread creation: use thread pools or worker queues.
+- Busy-wait loops: replace with condition_variable or use exponential backoff.
+- Blocking syscalls in worker threads: isolate I/O threads from CPU-bound workers.
+- NUMA thrashing: bind memory/pinning threads to NUMA nodes.
+- Work imbalance: use work-stealing thread pools or dynamic queues.
+
+Instrumentation suggestions (low-overhead)
+- Add coarse histograms or HdrHistogram for latency/queue-length tracking inside MessageBus or ECU message handling to see tail latencies.
+- Expose per-thread counters and aggregated stats.
+- Add event points for handoffs (enqueue/dequeue) with timestamps to compute wait times.
+
+Small actionable checklist for your codebase
+- Build with -g -O2 and run perf → flamegraph to see hotspots.
+- Run TSAN to find data races.
+- Instrument MessageBus to record enqueue→dequeue latency histograms.
+- Inspect lock hold times with perf lock or eBPF off-CPU stacks.
+- If you see many short critical sections contending, try sharding the bus or use lock-free queues (concurrent_ring_buffer, folly/MPMC_queue, boost::lockfree).
+
+Short reading / tools links to search
+- “FlameGraph Brendan Gregg”
+- “Linux perf tutorial”
+- “ThreadSanitizer documentation”
+- “C++ Concurrency in Action”
