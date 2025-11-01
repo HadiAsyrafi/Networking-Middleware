@@ -69,3 +69,41 @@ int main() {
 
     return 0;
 }
+
+/*
+ * Learning Note:
+ *
+ * 0000000000412df0 <std::condition_variable::wait(std::unique_lock<std::mutex>&)>:
+ * 412df0:	f3 0f 1e fa          	endbr64                                 # Intel CET feature (similar to ARM BTI)
+ * 412df4:	48 83 ec 08          	sub    $0x8,%rsp
+ * 412df8:	48 8b 36             	mov    (%rsi),%rsi
+ * 412dfb:	e8 00 d2 be ff       	callq  0 <_nl_current_LC_CTYPE>         # Likely pthread_cond_wait
+ * 412e00:	85 c0                	test   %eax,%eax
+ * 412e02:	75 05                	jne    412e09 <std::condition_variable::wait(std::unique_lock<std::mutex>&)+0x19>
+ * 412e04:	48 83 c4 08          	add    $0x8,%rsp
+ * 412e08:	c3                   	retq
+ * 412e09:	e8 a2 54 ff ff       	callq  4082b0 <std::terminate()>
+ * 412e0e:	66 90                	xchg   %ax,%ax
+ *
+ * Note: pthread_cond_wait
+ *  Block a thread until either:
+ *  - Another thread performs a signal or broadcast on the condition variable
+ *  - A signal is delivered to the thread
+ *  - The thread is cancelled
+ *
+ * Note: Intel Control-flow Enforcement Technology (CET)
+ * - JOP or ROP attacks can be particularly hard to detect or prevent
+ *      - Because it uses existing code running from executable memory
+ *      - In a creative way to change program behavior
+ *      - Using "gadgets" (small code sequences ending in control transfer instructions)
+ * - CET
+ *      - ROP protection:
+ *          - Enables the OS to create a shadow-stack
+ *          - Stores the original copy of the return addresses during CALL
+ *      - COP / JOP protection:
+ *          - Using Indirect Branch Tracking (IBT)
+ *          - ENDBRANCH: Mark valid indirect CALL/JMP instructions
+ *          - How?
+ *              - CPU state machine moves from IDLE to WAIT_FOR_ENDBRANCH when JMP/CALL is seen
+ *              - The next instruction in the program stream, must be endbr32/64
+ */
