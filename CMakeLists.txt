@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 project(AutoMiddleware LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+
+# NOTE: Purposely don't add any security hardening flags yet
+# We wanted to fuzz, and try security attacks such as BOF, ROP, JOP
+# Then see the impact of enabling various security hardening flags (canary, PIE, CET, etc.)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -O2")
 
 include_directories(include)
