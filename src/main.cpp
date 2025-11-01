@@ -15,8 +15,8 @@ int main() {
 
     // Dashboard ECU
     DashboardECU dashboardEcu(msgBus);
-    dashboardEcu.subscribeTopic("RPM");
-    dashboardEcu.subscribeTopic("TEMP");
+    dashboardEcu.subscribeTo("RPM");
+    dashboardEcu.subscribeTo("TEMP");
 
     // ECU Simulation
     RpmECU rpmEcu(msgBus);

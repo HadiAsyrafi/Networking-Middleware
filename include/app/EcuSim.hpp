@@ -130,12 +130,13 @@ class DashboardECU : public ECU {
 public:
     DashboardECU(MessageBus& bus) : ECU(bus) {}
 
-    void subscribeTopic(const std::string& string) {
+    void subscribeTo(const std::string& string) {
         m_messageBus.subscribe(string, m_subscriber);
     }
 
 protected:
     void run() override {
+        // Performance: Now its polling, consider doing interrupt-based
         while (m_running) {
             // Infinite loop - do nothing for now
             if (m_subscriber->hasMessage()) {
