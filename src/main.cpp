@@ -12,25 +12,24 @@ int main() {
     // Create Bus
     auto msgBus    = MessageBus();
 
-    // Dashboard ECU
-    EngineControlECU engineEcu(msgBus);
-    DashboardECU     dashboardEcu(msgBus);
-    RpmECU           rpmEcu(msgBus);
-    TempECU          tempEcu(msgBus);
+    // Use RAII container for automatic cleanup
+    std::vector<std::unique_ptr<ECU>> ecus;
+    ecus.emplace_back(std::make_unique<EngineControlECU>(msgBus));
+    ecus.emplace_back(std::make_unique<DashboardECU>(msgBus));
+    ecus.emplace_back(std::make_unique<RpmECU>(msgBus));
+    ecus.emplace_back(std::make_unique<TempECU>(msgBus));
 
     // Start all ECUs
-    engineEcu.start();
-    dashboardEcu.start();
-    rpmEcu.start();
-    tempEcu.start();
+    for (auto& ecu : ecus) {
+        ecu->start();
+    }
 
-    // Let it run for 3 seconds
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
-    engineEcu.stop();
-    dashboardEcu.stop();
-    rpmEcu.stop();
-    tempEcu.stop();
+    // Stop all ECUs - RAII will handle cleanup
+    for (auto& ecu : ecus) {
+        ecu->stop();
+    }
 
     return 0;
 }
