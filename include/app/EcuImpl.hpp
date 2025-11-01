@@ -63,7 +63,7 @@ public:
 
 protected:
     void run() override {
-        // Performance: Now its polling, consider doing interrupt-based
+        // Performance: Now its polling, consider doing interrupt-based using condition_variable
         while (m_running) {
             // Infinite loop - do nothing for now
             if (m_subscriber->hasMessage()) {

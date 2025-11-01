@@ -1,0 +1,12 @@
+List of TODO:
+1. Explore profiling & tuning (perf, valgrind, etc)
+2. Enable benchmarking & profiling (tracy, google benchmarking)
+3. Performance: Use thread pool
+    - validate context switches, and CPU utilization (before vs after)
+4. Update MessageBus to communicate through VCAN
+    - sudo modprobe vcan
+    - candump vcan0
+5. Enable TCP/UDP server client variant
+    - using non-blocking socket
+    - run 2 apps  on localhost
+6. Emulate SOME/IP & DDS
