@@ -27,4 +27,12 @@ public:
     std::string getValue() const override { return m_value; }
 };
 
+class StatusMessage : public Message {
+    std::string m_value;
+public:
+    explicit StatusMessage(const std::string& status) : m_value(status) {}
+    std::string getTopic() const override { return "STATUS"; }
+    std::string getValue() const override { return m_value; }
+};
+
 using MessagePtr = std::shared_ptr<Message>;

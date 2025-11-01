@@ -5,24 +5,21 @@
 #include <iostream>
 #include <thread>
 
-#include <middleware/MessageBus.hpp>
-#include <app/EcuSim.hpp>
-#include <app/EngineSubscriber.hpp>
+#include "middleware/MessageBus.hpp"
+#include "app/EcuImpl.hpp"
 
 int main() {
     // Create Bus
     auto msgBus    = MessageBus();
 
     // Dashboard ECU
-    DashboardECU dashboardEcu(msgBus);
-    dashboardEcu.subscribeTo("RPM");
-    dashboardEcu.subscribeTo("TEMP");
-
-    // ECU Simulation
-    RpmECU rpmEcu(msgBus);
-    TempECU tempEcu(msgBus);
+    EngineControlECU engineEcu(msgBus);
+    DashboardECU     dashboardEcu(msgBus);
+    RpmECU           rpmEcu(msgBus);
+    TempECU          tempEcu(msgBus);
 
     // Start all ECUs
+    engineEcu.start();
     dashboardEcu.start();
     rpmEcu.start();
     tempEcu.start();
@@ -30,6 +27,7 @@ int main() {
     // Let it run for 3 seconds
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
+    engineEcu.stop();
     dashboardEcu.stop();
     rpmEcu.stop();
     tempEcu.stop();

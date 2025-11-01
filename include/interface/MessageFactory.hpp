@@ -59,3 +59,11 @@ public:
         return std::make_shared<TempMessage>(status);
     }
 };
+
+class StatusMsgFactory : public MessageFactory {
+public:
+    MessagePtr factoryMethod() const override {
+        auto status = "Good";
+        return std::make_shared<StatusMessage>(status);
+    }
+};
